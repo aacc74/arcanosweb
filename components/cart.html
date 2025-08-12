@@ -1,0 +1,91 @@
+<div class="modal" id="cartModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tu Carrito de Compras</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Carrito cargado dinámicamente -->
+        </div>
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Impuestos (<span id="taxRateValue">10.5</span>%):</span>
+                <span id="cartTax">$0.00</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+
+            <!-- Métodos de pago (solo para clientes) -->
+            <div class="payment-methods" id="customerPaymentSection">
+                <label for="paymentMethod">Método de Pago:</label>
+                <select id="paymentMethod">
+                    <option value="pos">Punto de Venta</option>
+                    <option value="mobile">Pago Móvil</option>
+                    <option value="usd">Divisa $</option>
+                    <option value="eur">Divisa €</option>
+                    <option value="cash">Efectivo Bs</option>
+                </select>
+            </div>
+
+            <!-- Detalles específicos para cada método de pago -->
+            <div id="posDetails" class="payment-detail">
+                <div class="bank-info">
+                    <p><strong>Punto de Venta</strong></p>
+                </div>
+            </div>
+
+            <div id="mobileDetails" class="payment-detail">
+                <div class="bank-info">
+                    <p><strong>Pago Móvil</strong></p>
+                    <p>Banco: Banco de Venezuela</p>
+                    <p>Teléfono: 0412-1234567</p>
+                    <p>Cédula: V-12345678</p>
+                </div>
+                <label for="mobileReference">Número de Referencia:</label>
+                <input type="text" id="mobileReference" placeholder="Ingrese el número de referencia">
+            </div>
+
+            <div id="usdDetails" class="payment-detail">
+                <div class="bank-info">
+                    <p><strong>Transferencia en Dólares</strong></p>
+                    <p>Banco: Bank of America</p>
+                    <p>Número de cuenta: 1234567890</p>
+                    <p>SWIFT: BOFAUS3N</p>
+                </div>
+                <label for="usdReference">Número de Referencia:</label>
+                <input type="text" id="usdReference" placeholder="Ingrese el número de referencia">
+                <label for="usdReceipt">Subir comprobante:</label>
+                <input type="file" id="usdReceipt" accept="image/*">
+            </div>
+
+            <div id="eurDetails" class="payment-detail">
+                <div class="bank-info">
+                    <p><strong>Transferencia en Euros</strong></p>
+                    <p>Banco: Deutsche Bank</p>
+                    <p>IBAN: DE89 3704 0044 0532 0130 00</p>
+                    <p>BIC: DEUTDEDBXXX</p>
+                </div>
+                <label for="eurReference">Número de Referencia:</label>
+                <input type="text" id="eurReference" placeholder="Ingrese el número de referencia">
+                <label for="eurReceipt">Subir comprobante:</label>
+                <input type="file" id="eurReceipt" accept="image/*">
+            </div>
+
+            <div id="cashDetails" class="payment-detail">
+                <div class="bank-info">
+                    <p><strong>Efectivo en Bolívares</strong></p>
+                    <p>Por favor, prepare el monto exacto para la entrega.</p>
+                    <p>El pago se realizará al momento de recibir el pedido.</p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" id="checkoutBtn">Proceder al Pago</button>
+        </div>
+    </div>
+</div>

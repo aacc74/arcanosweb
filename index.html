@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcanos Lunch | Sistema de Pedidos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    
+    <!-- Header Animado -->
+    <header id="mainHeader">
+        <div class="header-content">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="#" class="logo">Arcanos Lunch</a>
+            <button id="desktopCartBtn" class="cart-btn" style="display: none;">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </button>
+            <button id="logoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Barra lateral de categorías -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Categorías</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="categories-container" id="categoriesContainer">
+            <!-- Las categorías se cargarán dinámicamente -->
+        </div>
+    </aside>
+    
+    <!-- Overlay para fondo oscuro -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Brand Section -->
+    <div class="container brand-section">
+        <h1 class="brand">Arcanos Lunch</h1>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="container" id="mainContent">
+        <!-- Los componentes se cargarán aquí dinámicamente -->
+    </main>
+    
+    <!-- Magic Navigation Menu -->
+    <nav class="magic-nav" id="magicNav">
+        <a href="#" class="magic-nav-item active" data-section="menu">
+            <i class="fas fa-utensils"></i>
+            <span>Menú</span>
+        </a>
+        <a href="#" class="magic-nav-item" data-section="orders">
+            <i class="fas fa-list"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="#" class="magic-nav-item" data-section="profile">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+        <a href="#" class="magic-nav-item" data-section="admin" id="adminMobileNavItem" style="display: none;">
+            <i class="fas fa-cog"></i>
+            <span>Admin</span>
+        </a>
+        <a href="#" class="magic-nav-item" id="mobileCartIcon">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Carrito</span>
+        </a>
+    </nav>
+    
+    <!-- Notificación para cocineros -->
+    <div class="notification" id="orderNotification">
+        <h4>¡Nuevo Pedido!</h4>
+        <p id="notificationContent">Mesa 1 ha realizado un nuevo pedido</p>
+    </div>
+    
+    <!-- Incluir scripts -->
+    <script src="js/firebase.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
