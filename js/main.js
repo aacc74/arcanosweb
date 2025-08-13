@@ -355,13 +355,22 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // Cargar componente
-function loadComponent(component) {
-    fetch(`components/${component}.html`)
-        .then(response => response.text())
-        .then(html => {
-            mainContent.innerHTML = html;
-            initializeComponent(component);
-        });
+async function loadComponent(component) {
+    try {
+        const response = await fetch(`components/${component}.html`);
+        if (!response.ok) throw new Error('Componente no encontrado');
+        const html = await response.text();
+        mainContent.innerHTML = html;
+        initializeComponent(component);
+    } catch (error) {
+        console.error('Error cargando componente:', error);
+        mainContent.innerHTML = `
+            <div class="error">
+                <h3>Error al cargar la página</h3>
+                <p>${error.message}</p>
+            </div>
+        `;
+    }
 }
 
 function initializeComponent(component) {
@@ -387,6 +396,9 @@ function initializeComponent(component) {
             break;
         case 'auth':
             setAuthMode('login');
+            break;
+        case 'cart':
+            // Solo se carga como modal, no requiere inicialización adicional
             break;
     }
 }
@@ -477,6 +489,9 @@ function renderCategoryFilters() {
 
 // Renderizar productos
 function renderProducts() {
+    const productsContainer = document.getElementById('productsContainer');
+    if (!productsContainer) return;
+    
     productsContainer.innerHTML = '';
     
     // Filtrar productos por categoría
@@ -803,6 +818,9 @@ function updateOrderStatus(orderId, status) {
 
 // Renderizar productos actuales en panel de administración
 function renderCurrentProducts() {
+    const currentProducts = document.getElementById('currentProducts');
+    if (!currentProducts) return;
+    
     currentProducts.innerHTML = '';
     
     if (products.length === 0) {
@@ -862,6 +880,9 @@ function renderCurrentProducts() {
 function loadOrders() {
     if (!currentUser) return;
     
+    const ordersTableBody = document.getElementById('ordersTableBody');
+    if (!ordersTableBody) return;
+    
     db.collection("orders")
         .where("userId", "==", currentUser.uid)
         .orderBy("date", "desc")
@@ -914,6 +935,9 @@ function loadOrders() {
 // Cargar todos los pedidos (admin)
 function loadAdminOrders() {
     if (currentUserRole !== 'admin') return;
+    
+    const adminOrdersTableBody = document.getElementById('adminOrdersTableBody');
+    if (!adminOrdersTableBody) return;
     
     db.collection("orders")
         .orderBy("date", "desc")
@@ -1006,6 +1030,9 @@ function getStatusText(status) {
 function loadCustomers() {
     if (currentUserRole !== 'admin') return;
     
+    const customersTableBody = document.getElementById('customersTableBody');
+    if (!customersTableBody) return;
+    
     db.collection("customers").get()
         .then(querySnapshot => {
             customersTableBody.innerHTML = '';
@@ -1048,6 +1075,9 @@ function loadCustomers() {
 function renderProfile() {
     if (!currentUser) return;
 
+    const profileContainer = document.getElementById('profileContainer');
+    if (!profileContainer) return;
+
     // Obtener la fecha de creación de la cuenta
     const creationDate = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime) : null;
     const memberSince = creationDate ? creationDate.getFullYear() : 'N/A';
@@ -1079,7 +1109,7 @@ function renderProfile() {
     `;
 
     // Event listener para el botón de historial
-    document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+    document.getElementById('viewHistoryBtn')?.addEventListener('click', () => {
         loadComponent('orders');
     });
 }
@@ -1201,6 +1231,8 @@ function setupTableSelection() {
 
 // Renderizar productos para meseros
 function renderWaiterProducts() {
+    if (!waiterProductsContainer) return;
+    
     waiterProductsContainer.innerHTML = '';
     
     products.forEach(product => {
@@ -1327,6 +1359,8 @@ function listenForNewOrders() {
 // Cargar pedidos para cocina
 function loadKitchenOrders() {
     if (currentUserRole !== 'empanada_chef' && currentUserRole !== 'general_chef') return;
+    
+    if (!kitchenOrdersContainer) return;
     
     let query = db.collection("orders")
         .where("status", "in", ["pending", "preparing"])
@@ -1513,44 +1547,49 @@ function setupEventListeners() {
     });
     
     // Formulario de producto
-    productForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('productName').value;
-        const price = parseFloat(document.getElementById('productPrice').value);
-        const description = document.getElementById('productDescription').value;
-        const category = document.getElementById('productCategory').value;
-        
-        addProduct(name, price, description, category);
-        productForm.reset();
-    });
+    const productForm = document.getElementById('productForm');
+    if (productForm) {
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('productName').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const description = document.getElementById('productDescription').value;
+            const category = document.getElementById('productCategory').value;
+            
+            addProduct(name, price, description, category);
+            productForm.reset();
+        });
+    }
     
     // Formulario de configuración
-    settingsForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        taxRate = parseFloat(document.getElementById('taxRate').value);
-        taxRateValue.textContent = taxRate;
-        showNotification('Configuración guardada correctamente');
-    });
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            taxRate = parseFloat(document.getElementById('taxRate').value);
+            taxRateValue.textContent = taxRate;
+            showNotification('Configuración guardada correctamente');
+        });
+    }
     
     // Enlaces de autenticación
-    signUpLink.addEventListener('click', (e) => {
+    if (signUpLink) signUpLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('register');
     });
     
-    forgotPasswordLink.addEventListener('click', (e) => {
+    if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('forgot');
     });
     
-    loginLink.addEventListener('click', (e) => {
+    if (loginLink) loginLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('login');
     });
     
     // Cambio de método de pago
-    paymentMethod.addEventListener('change', handlePaymentMethodChange);
+    if (paymentMethod) paymentMethod.addEventListener('change', handlePaymentMethodChange);
     
     // Configurar selección de mesa
     setupTableSelection();
@@ -1561,7 +1600,13 @@ function setupEventListeners() {
 
 // Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', () => {
+    // Cargar componentes esenciales
+    loadComponent('auth');
+    loadComponent('cart');
+    
+    // Configurar event listeners
     setupEventListeners();
+    
     // Establecer modo de autenticación inicial
     setAuthMode('login');
     
