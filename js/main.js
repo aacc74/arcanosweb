@@ -13,61 +13,61 @@ let currentTable = null;
 let chefFilter = 'all';
 let realtimeOrdersListener = null;
 
-// Referencias DOM
-const mainHeader = document.getElementById('mainHeader');
-const logoutBtn = document.getElementById('logoutBtn');
-const mainContent = document.getElementById('mainContent');
-const cartModal = document.getElementById('cartModal');
-const closeModal = document.querySelector('.close-modal');
-const cartItems = document.getElementById('cartItems');
-const cartSubtotal = document.getElementById('cartSubtotal');
-const cartTax = document.getElementById('cartTax');
-const cartTotal = document.getElementById('cartTotal');
-const checkoutBtn = document.getElementById('checkoutBtn');
-const sections = document.querySelectorAll('main > section');
-const adminBtns = document.querySelectorAll('.admin-btn');
-const adminSections = document.querySelectorAll('.admin-section');
-const authSection = document.getElementById('authSection');
-const googleLoginBtn = document.getElementById('googleLogin');
-const appleLoginBtn = document.getElementById('appleLogin');
-const taxRateValue = document.getElementById('taxRateValue');
-const settingsForm = document.getElementById('settingsForm');
-const profileContainer = document.getElementById('profileContainer');
-const authForm = document.getElementById('authForm');
-const authEmail = document.getElementById('authEmail');
-const authPassword = document.getElementById('authPassword');
-const authConfirmPassword = document.getElementById('authConfirmPassword');
-const authSubmitBtn = document.getElementById('authSubmitBtn');
-const signUpLink = document.getElementById('signUpLink');
-const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-const loginLink = document.getElementById('loginLink');
-const authMessage = document.getElementById('authMessage');
-const confirmPasswordField = document.getElementById('confirmPasswordField');
-const magicNavItems = document.querySelectorAll('.magic-nav-item');
-const adminMobileNavItem = document.getElementById('adminMobileNavItem');
-const mobileCartIcon = document.getElementById('mobileCartIcon');
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.getElementById('sidebar');
-const closeSidebar = document.getElementById('closeSidebar');
-const overlay = document.getElementById('overlay');
-const categoriesContainer = document.getElementById('categoriesContainer');
-const paymentMethod = document.getElementById('paymentMethod');
-const posDetails = document.getElementById('posDetails');
-const mobileDetails = document.getElementById('mobileDetails');
-const usdDetails = document.getElementById('usdDetails');
-const eurDetails = document.getElementById('eurDetails');
-const cashDetails = document.getElementById('cashDetails');
-const mobileReference = document.getElementById('mobileReference');
-const waiterSection = document.getElementById('waiterSection');
-const chefSection = document.getElementById('chefSection');
-const waiterProductsContainer = document.getElementById('waiterProductsContainer');
-const kitchenOrdersContainer = document.getElementById('kitchenOrdersContainer');
-const filterButtons = document.querySelectorAll('.filter-btn');
-const orderNotification = document.getElementById('orderNotification');
-const notificationContent = document.getElementById('notificationContent');
-const customerPaymentSection = document.getElementById('customerPaymentSection');
-const magicNav = document.getElementById('magicNav');
-const desktopCartBtn = document.getElementById('desktopCartBtn');
+// Referencias DOM (se asignarán después de que el DOM esté cargado)
+let mainHeader;
+let logoutBtn;
+let mainContent;
+let cartModal;
+let closeModal;
+let cartItems;
+let cartSubtotal;
+let cartTax;
+let cartTotal;
+let checkoutBtn;
+let sections;
+let adminBtns;
+let adminSections;
+let authSection;
+let googleLoginBtn;
+let appleLoginBtn;
+let taxRateValue;
+let settingsForm;
+let profileContainer;
+let authForm;
+let authEmail;
+let authPassword;
+let authConfirmPassword;
+let authSubmitBtn;
+let signUpLink;
+let forgotPasswordLink;
+let loginLink;
+let authMessage;
+let confirmPasswordField;
+let magicNavItems;
+let adminMobileNavItem;
+let mobileCartIcon;
+let menuToggle;
+let sidebar;
+let closeSidebar;
+let overlay;
+let categoriesContainer;
+let paymentMethod;
+let posDetails;
+let mobileDetails;
+let usdDetails;
+let eurDetails;
+let cashDetails;
+let mobileReference;
+let waiterSection;
+let chefSection;
+let waiterProductsContainer;
+let kitchenOrdersContainer;
+let filterButtons;
+let orderNotification;
+let notificationContent;
+let customerPaymentSection;
+let magicNav;
+let desktopCartBtn;
 
 // Observador de autenticación
 auth.onAuthStateChanged(user => {
@@ -170,7 +170,7 @@ function updateUIForRole() {
             adminMobileNavItem.style.display = 'flex';
         } else {
             adminMobileNavItem.style.display = 'none';
-            if (document.getElementById('adminSection').style.display === 'block') {
+            if (document.getElementById('adminSection') && document.getElementById('adminSection').style.display === 'block') {
                 loadComponent('menu');
             }
         }
@@ -261,26 +261,6 @@ function setAuthMode(mode) {
     }
 }
 
-// Manejar envío de formulario de autenticación
-authForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = authEmail.value;
-    const password = authPassword.value;
-    const confirmPassword = authConfirmPassword.value;
-    
-    switch(authMode) {
-        case 'login': loginWithEmail(email, password); break;
-        case 'register': 
-            if (password !== confirmPassword) {
-                showNotification("Las contraseñas no coinciden");
-                return;
-            }
-            signUpWithEmail(email, password); 
-            break;
-        case 'forgot': resetPassword(email); break;
-    }
-});
-
 // Iniciar sesión con correo/contraseña
 function loginWithEmail(email, password) {
     auth.signInWithEmailAndPassword(email, password)
@@ -323,24 +303,6 @@ function resetPassword(email) {
     });
 }
 
-// Iniciar sesión con Google
-googleLoginBtn.addEventListener('click', () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(error => {
-        console.error("Error de autenticación: ", error);
-        showNotification(`Error al iniciar sesión: ${error.message}`);
-    });
-});
-
-// Iniciar sesión con Apple
-appleLoginBtn.addEventListener('click', () => {
-    const provider = new firebase.auth.OAuthProvider('apple.com');
-    auth.signInWithPopup(provider).catch(error => {
-        console.error("Error de autenticación: ", error);
-        showNotification(`Error al iniciar sesión: ${error.message}`);
-    });
-});
-
 // Cerrar sesión
 logoutBtn.addEventListener('click', () => {
     mainHeader.classList.remove('scrolled');
@@ -355,22 +317,17 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // Cargar componente
-async function loadComponent(component) {
-    try {
-        const response = await fetch(`components/${component}.html`);
-        if (!response.ok) throw new Error('Componente no encontrado');
-        const html = await response.text();
-        mainContent.innerHTML = html;
-        initializeComponent(component);
-    } catch (error) {
-        console.error('Error cargando componente:', error);
-        mainContent.innerHTML = `
-            <div class="error">
-                <h3>Error al cargar la página</h3>
-                <p>${error.message}</p>
-            </div>
-        `;
-    }
+function loadComponent(component) {
+    fetch(`components/${component}.html`)
+        .then(response => response.text())
+        .then(html => {
+            mainContent.innerHTML = html;
+            initializeComponent(component);
+        })
+        .catch(error => {
+            console.error('Error cargando componente:', error);
+            mainContent.innerHTML = `<p>Error cargando el componente: ${component}</p>`;
+        });
 }
 
 function initializeComponent(component) {
@@ -396,9 +353,6 @@ function initializeComponent(component) {
             break;
         case 'auth':
             setAuthMode('login');
-            break;
-        case 'cart':
-            // Solo se carga como modal, no requiere inicialización adicional
             break;
     }
 }
@@ -490,8 +444,6 @@ function renderCategoryFilters() {
 // Renderizar productos
 function renderProducts() {
     const productsContainer = document.getElementById('productsContainer');
-    if (!productsContainer) return;
-    
     productsContainer.innerHTML = '';
     
     // Filtrar productos por categoría
@@ -819,8 +771,6 @@ function updateOrderStatus(orderId, status) {
 // Renderizar productos actuales en panel de administración
 function renderCurrentProducts() {
     const currentProducts = document.getElementById('currentProducts');
-    if (!currentProducts) return;
-    
     currentProducts.innerHTML = '';
     
     if (products.length === 0) {
@@ -879,18 +829,15 @@ function renderCurrentProducts() {
 // Cargar pedidos del cliente
 function loadOrders() {
     if (!currentUser) return;
-    
     const ordersTableBody = document.getElementById('ordersTableBody');
-    if (!ordersTableBody) return;
+    orders = [];
+    ordersTableBody.innerHTML = '';
     
     db.collection("orders")
         .where("userId", "==", currentUser.uid)
         .orderBy("date", "desc")
         .get()
         .then(querySnapshot => {
-            orders = [];
-            ordersTableBody.innerHTML = '';
-            
             if (querySnapshot.empty) {
                 ordersTableBody.innerHTML = `
                     <tr>
@@ -935,16 +882,13 @@ function loadOrders() {
 // Cargar todos los pedidos (admin)
 function loadAdminOrders() {
     if (currentUserRole !== 'admin') return;
-    
     const adminOrdersTableBody = document.getElementById('adminOrdersTableBody');
-    if (!adminOrdersTableBody) return;
+    adminOrdersTableBody.innerHTML = '';
     
     db.collection("orders")
         .orderBy("date", "desc")
         .get()
         .then(querySnapshot => {
-            adminOrdersTableBody.innerHTML = '';
-            
             if (querySnapshot.empty) {
                 adminOrdersTableBody.innerHTML = `
                     <tr>
@@ -1029,14 +973,11 @@ function getStatusText(status) {
 // Cargar clientes (admin)
 function loadCustomers() {
     if (currentUserRole !== 'admin') return;
-    
     const customersTableBody = document.getElementById('customersTableBody');
-    if (!customersTableBody) return;
+    customersTableBody.innerHTML = '';
     
     db.collection("customers").get()
         .then(querySnapshot => {
-            customersTableBody.innerHTML = '';
-            
             if (querySnapshot.empty) {
                 customersTableBody.innerHTML = `
                     <tr>
@@ -1075,9 +1016,6 @@ function loadCustomers() {
 function renderProfile() {
     if (!currentUser) return;
 
-    const profileContainer = document.getElementById('profileContainer');
-    if (!profileContainer) return;
-
     // Obtener la fecha de creación de la cuenta
     const creationDate = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime) : null;
     const memberSince = creationDate ? creationDate.getFullYear() : 'N/A';
@@ -1109,7 +1047,7 @@ function renderProfile() {
     `;
 
     // Event listener para el botón de historial
-    document.getElementById('viewHistoryBtn')?.addEventListener('click', () => {
+    document.getElementById('viewHistoryBtn').addEventListener('click', () => {
         loadComponent('orders');
     });
 }
@@ -1231,8 +1169,6 @@ function setupTableSelection() {
 
 // Renderizar productos para meseros
 function renderWaiterProducts() {
-    if (!waiterProductsContainer) return;
-    
     waiterProductsContainer.innerHTML = '';
     
     products.forEach(product => {
@@ -1360,8 +1296,6 @@ function listenForNewOrders() {
 function loadKitchenOrders() {
     if (currentUserRole !== 'empanada_chef' && currentUserRole !== 'general_chef') return;
     
-    if (!kitchenOrdersContainer) return;
-    
     let query = db.collection("orders")
         .where("status", "in", ["pending", "preparing"])
         .orderBy("date", "asc");
@@ -1479,6 +1413,62 @@ function setupChefFilters() {
 // =====================================
 
 function setupEventListeners() {
+    // Asignar referencias DOM
+    mainHeader = document.getElementById('mainHeader');
+    logoutBtn = document.getElementById('logoutBtn');
+    mainContent = document.getElementById('mainContent');
+    cartModal = document.getElementById('cartModal');
+    closeModal = document.querySelector('.close-modal');
+    cartItems = document.getElementById('cartItems');
+    cartSubtotal = document.getElementById('cartSubtotal');
+    cartTax = document.getElementById('cartTax');
+    cartTotal = document.getElementById('cartTotal');
+    checkoutBtn = document.getElementById('checkoutBtn');
+    sections = document.querySelectorAll('main > section');
+    adminBtns = document.querySelectorAll('.admin-btn');
+    adminSections = document.querySelectorAll('.admin-section');
+    authSection = document.getElementById('authSection');
+    googleLoginBtn = document.getElementById('googleLogin');
+    appleLoginBtn = document.getElementById('appleLogin');
+    taxRateValue = document.getElementById('taxRateValue');
+    settingsForm = document.getElementById('settingsForm');
+    profileContainer = document.getElementById('profileContainer');
+    authForm = document.getElementById('authForm');
+    authEmail = document.getElementById('authEmail');
+    authPassword = document.getElementById('authPassword');
+    authConfirmPassword = document.getElementById('authConfirmPassword');
+    authSubmitBtn = document.getElementById('authSubmitBtn');
+    signUpLink = document.getElementById('signUpLink');
+    forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    loginLink = document.getElementById('loginLink');
+    authMessage = document.getElementById('authMessage');
+    confirmPasswordField = document.getElementById('confirmPasswordField');
+    magicNavItems = document.querySelectorAll('.magic-nav-item');
+    adminMobileNavItem = document.getElementById('adminMobileNavItem');
+    mobileCartIcon = document.getElementById('mobileCartIcon');
+    menuToggle = document.getElementById('menuToggle');
+    sidebar = document.getElementById('sidebar');
+    closeSidebar = document.getElementById('closeSidebar');
+    overlay = document.getElementById('overlay');
+    categoriesContainer = document.getElementById('categoriesContainer');
+    paymentMethod = document.getElementById('paymentMethod');
+    posDetails = document.getElementById('posDetails');
+    mobileDetails = document.getElementById('mobileDetails');
+    usdDetails = document.getElementById('usdDetails');
+    eurDetails = document.getElementById('eurDetails');
+    cashDetails = document.getElementById('cashDetails');
+    mobileReference = document.getElementById('mobileReference');
+    waiterSection = document.getElementById('waiterSection');
+    chefSection = document.getElementById('chefSection');
+    waiterProductsContainer = document.getElementById('waiterProductsContainer');
+    kitchenOrdersContainer = document.getElementById('kitchenOrdersContainer');
+    filterButtons = document.querySelectorAll('.filter-btn');
+    orderNotification = document.getElementById('orderNotification');
+    notificationContent = document.getElementById('notificationContent');
+    customerPaymentSection = document.getElementById('customerPaymentSection');
+    magicNav = document.getElementById('magicNav');
+    desktopCartBtn = document.getElementById('desktopCartBtn');
+
     // Toggle del menú lateral
     menuToggle.addEventListener('click', openSidebar);
     closeSidebar.addEventListener('click', closeSidebarFunc);
@@ -1563,50 +1553,80 @@ function setupEventListeners() {
     }
     
     // Formulario de configuración
-    if (settingsForm) {
-        settingsForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            taxRate = parseFloat(document.getElementById('taxRate').value);
-            taxRateValue.textContent = taxRate;
-            showNotification('Configuración guardada correctamente');
-        });
-    }
+    settingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        taxRate = parseFloat(document.getElementById('taxRate').value);
+        taxRateValue.textContent = taxRate;
+        showNotification('Configuración guardada correctamente');
+    });
     
     // Enlaces de autenticación
-    if (signUpLink) signUpLink.addEventListener('click', (e) => {
+    signUpLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('register');
     });
     
-    if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => {
+    forgotPasswordLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('forgot');
     });
     
-    if (loginLink) loginLink.addEventListener('click', (e) => {
+    loginLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('login');
     });
     
     // Cambio de método de pago
-    if (paymentMethod) paymentMethod.addEventListener('change', handlePaymentMethodChange);
+    paymentMethod.addEventListener('change', handlePaymentMethodChange);
     
     // Configurar selección de mesa
     setupTableSelection();
     
     // Configurar filtros de cocina
     setupChefFilters();
+
+    // Iniciar sesión con Google
+    googleLoginBtn.addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(error => {
+            console.error("Error de autenticación: ", error);
+            showNotification(`Error al iniciar sesión: ${error.message}`);
+        });
+    });
+
+    // Iniciar sesión con Apple
+    appleLoginBtn.addEventListener('click', () => {
+        const provider = new firebase.auth.OAuthProvider('apple.com');
+        auth.signInWithPopup(provider).catch(error => {
+            console.error("Error de autenticación: ", error);
+            showNotification(`Error al iniciar sesión: ${error.message}`);
+        });
+    });
+
+    // Manejar formulario de autenticación
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = authEmail.value;
+        const password = authPassword.value;
+        const confirmPassword = authConfirmPassword.value;
+        
+        switch(authMode) {
+            case 'login': loginWithEmail(email, password); break;
+            case 'register': 
+                if (password !== confirmPassword) {
+                    showNotification("Las contraseñas no coinciden");
+                    return;
+                }
+                signUpWithEmail(email, password); 
+                break;
+            case 'forgot': resetPassword(email); break;
+        }
+    });
 }
 
 // Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', () => {
-    // Cargar componentes esenciales
-    loadComponent('auth');
-    loadComponent('cart');
-    
-    // Configurar event listeners
     setupEventListeners();
-    
     // Establecer modo de autenticación inicial
     setAuthMode('login');
     
