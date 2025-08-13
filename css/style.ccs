@@ -1016,7 +1016,7 @@ body {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transition;
 }
 
 .filter-btn.active, .filter-btn:hover {
