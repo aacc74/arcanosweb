@@ -72,6 +72,14 @@ let desktopCartBtn;
 // Observador de autenticación
 auth.onAuthStateChanged(user => {
     currentUser = user;
+    
+    // Verificar que los elementos DOM estén disponibles
+    if (!mainHeader || !authSection || !magicNav) {
+        console.log("Elementos DOM aún no disponibles, reintentando en 100ms");
+        setTimeout(() => auth.onAuthStateChanged(user), 100);
+        return;
+    }
+
     if (user) {
         // Mostrar header animado
         setTimeout(() => {
@@ -186,9 +194,9 @@ function updateUIForRole() {
     }
     
     // Ocultar sección de pago para meseros
-    if (currentUserRole === 'waiter') {
+    if (customerPaymentSection && currentUserRole === 'waiter') {
         customerPaymentSection.style.display = 'none';
-    } else {
+    } else if (customerPaymentSection) {
         customerPaymentSection.style.display = 'block';
     }
     
@@ -233,6 +241,9 @@ function saveCustomerData(user) {
 // Establecer modo de autenticación
 function setAuthMode(mode) {
     authMode = mode;
+    if (!authMessage || !authSubmitBtn || !confirmPasswordField || 
+        !signUpLink || !forgotPasswordLink || !loginLink) return;
+        
     switch(mode) {
         case 'login':
             authMessage.textContent = "Inicia sesión para continuar";
@@ -302,19 +313,6 @@ function resetPassword(email) {
         showNotification(`Error: ${error.message}`);
     });
 }
-
-// Cerrar sesión
-logoutBtn.addEventListener('click', () => {
-    mainHeader.classList.remove('scrolled');
-    mainHeader.style.transition = 'transform 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
-    mainHeader.style.transform = 'translateY(-100%)';
-    
-    setTimeout(() => {
-        auth.signOut().then(() => showNotification('Sesión cerrada correctamente'))
-        .catch(error => showNotification(`Error al cerrar sesión: ${error.message}`));
-        mainHeader.style.transition = '';
-    }, 400);
-});
 
 // Cargar componente
 function loadComponent(component) {
@@ -444,6 +442,8 @@ function renderCategoryFilters() {
 // Renderizar productos
 function renderProducts() {
     const productsContainer = document.getElementById('productsContainer');
+    if (!productsContainer) return;
+    
     productsContainer.innerHTML = '';
     
     // Filtrar productos por categoría
@@ -516,6 +516,8 @@ function addToCart(productId) {
 
 // Renderizar carrito
 function renderCart() {
+    if (!cartItems) return;
+    
     cartItems.innerHTML = '';
     
     if (cart.length === 0) {
@@ -771,6 +773,8 @@ function updateOrderStatus(orderId, status) {
 // Renderizar productos actuales en panel de administración
 function renderCurrentProducts() {
     const currentProducts = document.getElementById('currentProducts');
+    if (!currentProducts) return;
+    
     currentProducts.innerHTML = '';
     
     if (products.length === 0) {
@@ -830,6 +834,8 @@ function renderCurrentProducts() {
 function loadOrders() {
     if (!currentUser) return;
     const ordersTableBody = document.getElementById('ordersTableBody');
+    if (!ordersTableBody) return;
+    
     orders = [];
     ordersTableBody.innerHTML = '';
     
@@ -883,6 +889,8 @@ function loadOrders() {
 function loadAdminOrders() {
     if (currentUserRole !== 'admin') return;
     const adminOrdersTableBody = document.getElementById('adminOrdersTableBody');
+    if (!adminOrdersTableBody) return;
+    
     adminOrdersTableBody.innerHTML = '';
     
     db.collection("orders")
@@ -974,6 +982,8 @@ function getStatusText(status) {
 function loadCustomers() {
     if (currentUserRole !== 'admin') return;
     const customersTableBody = document.getElementById('customersTableBody');
+    if (!customersTableBody) return;
+    
     customersTableBody.innerHTML = '';
     
     db.collection("customers").get()
@@ -1014,7 +1024,7 @@ function loadCustomers() {
 
 // Renderizar perfil
 function renderProfile() {
-    if (!currentUser) return;
+    if (!currentUser || !profileContainer) return;
 
     // Obtener la fecha de creación de la cuenta
     const creationDate = currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime) : null;
@@ -1047,9 +1057,12 @@ function renderProfile() {
     `;
 
     // Event listener para el botón de historial
-    document.getElementById('viewHistoryBtn').addEventListener('click', () => {
-        loadComponent('orders');
-    });
+    const historyBtn = document.getElementById('viewHistoryBtn');
+    if (historyBtn) {
+        historyBtn.addEventListener('click', () => {
+            loadComponent('orders');
+        });
+    }
 }
 
 // Mostrar notificación
@@ -1115,31 +1128,32 @@ function closeSidebarFunc() {
 
 // Manejar cambio de método de pago
 function handlePaymentMethodChange() {
+    if (!paymentMethod) return;
     const method = paymentMethod.value;
     
     // Ocultar todos los detalles
-    posDetails.classList.remove('active');
-    mobileDetails.classList.remove('active');
-    usdDetails.classList.remove('active');
-    eurDetails.classList.remove('active');
-    cashDetails.classList.remove('active');
+    if (posDetails) posDetails.classList.remove('active');
+    if (mobileDetails) mobileDetails.classList.remove('active');
+    if (usdDetails) usdDetails.classList.remove('active');
+    if (eurDetails) eurDetails.classList.remove('active');
+    if (cashDetails) cashDetails.classList.remove('active');
     
     // Mostrar detalles del método seleccionado
     switch(method) {
         case 'pos':
-            posDetails.classList.add('active');
+            if (posDetails) posDetails.classList.add('active');
             break;
         case 'mobile':
-            mobileDetails.classList.add('active');
+            if (mobileDetails) mobileDetails.classList.add('active');
             break;
         case 'usd':
-            usdDetails.classList.add('active');
+            if (usdDetails) usdDetails.classList.add('active');
             break;
         case 'eur':
-            eurDetails.classList.add('active');
+            if (eurDetails) eurDetails.classList.add('active');
             break;
         case 'cash':
-            cashDetails.classList.add('active');
+            if (cashDetails) cashDetails.classList.add('active');
             break;
     }
 }
@@ -1159,7 +1173,8 @@ function setupTableSelection() {
             currentTable = card.dataset.table;
             
             // Habilitar el menú
-            document.getElementById('waiterMenuSection').style.display = 'block';
+            const waiterMenu = document.getElementById('waiterMenuSection');
+            if (waiterMenu) waiterMenu.style.display = 'block';
             
             // Cargar productos
             renderWaiterProducts();
@@ -1169,6 +1184,8 @@ function setupTableSelection() {
 
 // Renderizar productos para meseros
 function renderWaiterProducts() {
+    if (!waiterProductsContainer) return;
+    
     waiterProductsContainer.innerHTML = '';
     
     products.forEach(product => {
@@ -1278,11 +1295,11 @@ function listenForNewOrders() {
                 if (change.type === "added") {
                     // Mostrar notificación de nuevo pedido
                     const order = change.doc.data();
-                    notificationContent.textContent = `Mesa ${order.table || 'Llevar'} ha realizado un nuevo pedido`;
-                    orderNotification.classList.add('show');
+                    if (notificationContent) notificationContent.textContent = `Mesa ${order.table || 'Llevar'} ha realizado un nuevo pedido`;
+                    if (orderNotification) orderNotification.classList.add('show');
                     
                     setTimeout(() => {
-                        orderNotification.classList.remove('show');
+                        if (orderNotification) orderNotification.classList.remove('show');
                     }, 5000);
                 }
             });
@@ -1295,6 +1312,7 @@ function listenForNewOrders() {
 // Cargar pedidos para cocina
 function loadKitchenOrders() {
     if (currentUserRole !== 'empanada_chef' && currentUserRole !== 'general_chef') return;
+    if (!kitchenOrdersContainer) return;
     
     let query = db.collection("orders")
         .where("status", "in", ["pending", "preparing"])
@@ -1398,6 +1416,8 @@ function markOrderAsReady(orderId) {
 
 // Aplicar filtros
 function setupChefFilters() {
+    if (!filterButtons) return;
+    
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
             filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -1470,37 +1490,45 @@ function setupEventListeners() {
     desktopCartBtn = document.getElementById('desktopCartBtn');
 
     // Toggle del menú lateral
-    menuToggle.addEventListener('click', openSidebar);
-    closeSidebar.addEventListener('click', closeSidebarFunc);
-    overlay.addEventListener('click', closeSidebarFunc);
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarFunc);
+    if (overlay) overlay.addEventListener('click', closeSidebarFunc);
     
     // Navegación mágica
-    magicNavItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (item.id !== 'mobileCartIcon') {
-                loadComponent(item.dataset.section);
-            } else {
-                renderCart();
-                cartModal.style.display = 'flex';
-            }
+    if (magicNavItems) {
+        magicNavItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (item.id !== 'mobileCartIcon') {
+                    loadComponent(item.dataset.section);
+                } else {
+                    renderCart();
+                    cartModal.style.display = 'flex';
+                }
+            });
         });
-    });
+    }
     
     // Carrito
-    mobileCartIcon.addEventListener('click', () => {
-        renderCart();
-        cartModal.style.display = 'flex';
-    });
+    if (mobileCartIcon) {
+        mobileCartIcon.addEventListener('click', () => {
+            renderCart();
+            cartModal.style.display = 'flex';
+        });
+    }
     
-    desktopCartBtn.addEventListener('click', () => {
-        renderCart();
-        cartModal.style.display = 'flex';
-    });
+    if (desktopCartBtn) {
+        desktopCartBtn.addEventListener('click', () => {
+            renderCart();
+            cartModal.style.display = 'flex';
+        });
+    }
     
-    closeModal.addEventListener('click', () => {
-        cartModal.style.display = 'none';
-    });
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            cartModal.style.display = 'none';
+        });
+    }
     
     // Cerrar modal al hacer clic fuera
     window.addEventListener('click', (e) => {
@@ -1510,31 +1538,35 @@ function setupEventListeners() {
     });
     
     // Checkout
-    checkoutBtn.addEventListener('click', () => {
-        if (currentUserRole === 'waiter') {
-            processWaiterOrder();
-        } else {
-            checkout();
-        }
-    });
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (currentUserRole === 'waiter') {
+                processWaiterOrder();
+            } else {
+                checkout();
+            }
+        });
+    }
     
     // Panel de administración
-    adminBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            
-            // Actualizar clase activa
-            adminBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Mostrar sección correspondiente
-            adminSections.forEach(sec => {
-                sec.classList.remove('active');
+    if (adminBtns) {
+        adminBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Actualizar clase activa
+                adminBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Mostrar sección correspondiente
+                adminSections.forEach(sec => {
+                    sec.classList.remove('active');
+                });
+                
+                document.getElementById(`${tab}Admin`).classList.add('active');
             });
-            
-            document.getElementById(`${tab}Admin`).classList.add('active');
         });
-    });
+    }
     
     // Formulario de producto
     const productForm = document.getElementById('productForm');
@@ -1553,31 +1585,33 @@ function setupEventListeners() {
     }
     
     // Formulario de configuración
-    settingsForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        taxRate = parseFloat(document.getElementById('taxRate').value);
-        taxRateValue.textContent = taxRate;
-        showNotification('Configuración guardada correctamente');
-    });
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            taxRate = parseFloat(document.getElementById('taxRate').value);
+            taxRateValue.textContent = taxRate;
+            showNotification('Configuración guardada correctamente');
+        });
+    }
     
     // Enlaces de autenticación
-    signUpLink.addEventListener('click', (e) => {
+    if (signUpLink) signUpLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('register');
     });
     
-    forgotPasswordLink.addEventListener('click', (e) => {
+    if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('forgot');
     });
     
-    loginLink.addEventListener('click', (e) => {
+    if (loginLink) loginLink.addEventListener('click', (e) => {
         e.preventDefault();
         setAuthMode('login');
     });
     
     // Cambio de método de pago
-    paymentMethod.addEventListener('change', handlePaymentMethodChange);
+    if (paymentMethod) paymentMethod.addEventListener('change', handlePaymentMethodChange);
     
     // Configurar selección de mesa
     setupTableSelection();
@@ -1586,42 +1620,65 @@ function setupEventListeners() {
     setupChefFilters();
 
     // Iniciar sesión con Google
-    googleLoginBtn.addEventListener('click', () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(error => {
-            console.error("Error de autenticación: ", error);
-            showNotification(`Error al iniciar sesión: ${error.message}`);
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                console.error("Error de autenticación: ", error);
+                showNotification(`Error al iniciar sesión: ${error.message}`);
+            });
         });
-    });
+    }
 
     // Iniciar sesión con Apple
-    appleLoginBtn.addEventListener('click', () => {
-        const provider = new firebase.auth.OAuthProvider('apple.com');
-        auth.signInWithPopup(provider).catch(error => {
-            console.error("Error de autenticación: ", error);
-            showNotification(`Error al iniciar sesión: ${error.message}`);
+    if (appleLoginBtn) {
+        appleLoginBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.OAuthProvider('apple.com');
+            auth.signInWithPopup(provider).catch(error => {
+                console.error("Error de autenticación: ", error);
+                showNotification(`Error al iniciar sesión: ${error.message}`);
+            });
         });
-    });
+    }
 
     // Manejar formulario de autenticación
-    authForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = authEmail.value;
-        const password = authPassword.value;
-        const confirmPassword = authConfirmPassword.value;
-        
-        switch(authMode) {
-            case 'login': loginWithEmail(email, password); break;
-            case 'register': 
-                if (password !== confirmPassword) {
-                    showNotification("Las contraseñas no coinciden");
-                    return;
-                }
-                signUpWithEmail(email, password); 
-                break;
-            case 'forgot': resetPassword(email); break;
-        }
-    });
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = authEmail.value;
+            const password = authPassword.value;
+            const confirmPassword = authConfirmPassword.value;
+            
+            switch(authMode) {
+                case 'login': loginWithEmail(email, password); break;
+                case 'register': 
+                    if (password !== confirmPassword) {
+                        showNotification("Las contraseñas no coinciden");
+                        return;
+                    }
+                    signUpWithEmail(email, password); 
+                    break;
+                case 'forgot': resetPassword(email); break;
+            }
+        });
+    }
+    
+    // Cerrar sesión
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (!mainHeader) return;
+            
+            mainHeader.classList.remove('scrolled');
+            mainHeader.style.transition = 'transform 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
+            mainHeader.style.transform = 'translateY(-100%)';
+            
+            setTimeout(() => {
+                auth.signOut().then(() => showNotification('Sesión cerrada correctamente'))
+                .catch(error => showNotification(`Error al cerrar sesión: ${error.message}`));
+                mainHeader.style.transition = '';
+            }, 400);
+        });
+    }
 }
 
 // Inicializar la aplicación
