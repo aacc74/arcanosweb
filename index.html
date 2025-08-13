@@ -6,7 +6,10 @@
     <title>Arcanos Lunch | Sistema de Pedidos</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Ruta corregida para evitar 404 -->
+    <link rel="stylesheet" href="./css/style.css">
+    <!-- Favicon opcional -->
+    <link rel="icon" href="./img/favicon.ico">
 </head>
 <body>
     <!-- Firebase SDK -->
@@ -46,20 +49,16 @@
         </div>
     </aside>
     
-    <!-- Overlay para fondo oscuro -->
     <div class="overlay" id="overlay"></div>
     
-    <!-- Brand Section -->
     <div class="container brand-section">
         <h1 class="brand">Arcanos Lunch</h1>
     </div>
     
-    <!-- Main Content -->
     <main class="container" id="mainContent">
         <!-- Los componentes se cargarán aquí dinámicamente -->
     </main>
     
-    <!-- Magic Navigation Menu -->
     <nav class="magic-nav" id="magicNav">
         <a href="#" class="magic-nav-item active" data-section="menu">
             <i class="fas fa-utensils"></i>
@@ -83,14 +82,13 @@
         </a>
     </nav>
     
-    <!-- Notificación para cocineros -->
     <div class="notification" id="orderNotification">
         <h4>¡Nuevo Pedido!</h4>
         <p id="notificationContent">Mesa 1 ha realizado un nuevo pedido</p>
     </div>
     
-    <!-- Incluir scripts -->
-    <script src="js/firebase.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Scripts con defer para ejecutarse después del DOM -->
+    <script src="./js/firebase.js" defer></script>
+    <script src="./js/main.js" defer></script>
 </body>
 </html>
