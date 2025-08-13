@@ -1,50 +1,40 @@
-<section id="authSection">
-    <div class="auth-container">
-        <div class="auth-header">
-            <div class="auth-logo">
-                <i class="fas fa-drumstick-bite"></i>
-                <h2>Arcanos Lunch</h2>
-                <p id="authMessage">Inicia sesión para continuar</p>
-            </div>
-        </div>
+<section id="authSection" class="auth-container">
+    <div class="auth-card">
+        <h2>Bienvenido a Arcanos Lunch</h2>
+        <p id="authMessage">Inicia sesión para continuar</p>
         
-        <div class="auth-body">
-            <form id="authForm" class="auth-form">
-                <div class="form-group">
-                    <label for="authEmail">Email</label>
-                    <input type="email" id="authEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="authPassword">Contraseña</label>
-                    <input type="password" id="authPassword" required>
-                </div>
-                <div id="confirmPasswordField" style="display: none;">
-                    <div class="form-group">
-                        <label for="authConfirmPassword">Confirmar Contraseña</label>
-                        <input type="password" id="authConfirmPassword">
-                    </div>
-                </div>
-                <button type="submit" class="btn" id="authSubmitBtn">Iniciar Sesión</button>
-            </form>
-        </div>
-        
-        <div class="auth-footer">
-            <div class="auth-links">
-                <a href="#" id="signUpLink">Registrarse</a> 
-                <a href="#" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
-                <a href="#" id="loginLink" style="display: none;">Volver a Iniciar Sesión</a>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="authEmail">Correo Electrónico</label>
+                <input type="email" id="authEmail" required>
             </div>
             
-            <div class="auth-options">
-                <button class="auth-btn btn-google" id="googleLogin">
-                    <i class="fab fa-google"></i>
-                    Iniciar con Google
-                </button>
-                <button class="auth-btn btn-apple" id="appleLogin">
-                    <i class="fab fa-apple"></i>
-                    Iniciar con Apple
-                </button>
+            <div class="form-group">
+                <label for="authPassword">Contraseña</label>
+                <input type="password" id="authPassword" required>
             </div>
+            
+            <div class="form-group" id="confirmPasswordField" style="display: none;">
+                <label for="authConfirmPassword">Confirmar Contraseña</label>
+                <input type="password" id="authConfirmPassword">
+            </div>
+            
+            <button type="submit" id="authSubmitBtn" class="btn btn-primary">Iniciar Sesión</button>
+        </form>
+        
+        <div class="social-login">
+            <button id="googleLogin" class="btn btn-google">
+                <i class="fab fa-google"></i> Continuar con Google
+            </button>
+            <button id="appleLogin" class="btn btn-apple">
+                <i class="fab fa-apple"></i> Continuar con Apple
+            </button>
+        </div>
+        
+        <div class="auth-links">
+            <a href="#" id="signUpLink">¿No tienes cuenta? Regístrate</a>
+            <a href="#" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
+            <a href="#" id="loginLink" style="display: none;">Volver a Iniciar Sesión</a>
         </div>
     </div>
 </section>
